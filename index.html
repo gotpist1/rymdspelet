@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rymdspelet – plugga astronomi</title>
+<style>
+:root{
+  --blue:#3a3fb5;--blue-d:#262a85;--blue-l:#e8e9fb;--yellow:#fecb00;--yellow-d:#c79c00;
+  --ink:#14213d;--muted:#4a5878;--bg:#f3f6fb;--card:#ffffff;--line:#d5deec;
+  --ok:#156b2f;--ok-bg:#d9f2e0;--bad:#b3261e;--bad-bg:#fde3e1;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--yellow-d);outline-offset:2px}
+header{background:radial-gradient(2px 2px at 20px 12px,#fff,transparent),radial-gradient(1.5px 1.5px at 90px 38px,#fff,transparent),radial-gradient(2px 2px at 160px 20px,#ffd23f,transparent),#0b1033;background-size:200px 60px;color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.hud{max-width:900px;margin:0 auto;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.hud h1{font-size:1.05rem;margin:0;white-space:nowrap}
+.hud .lvl{flex:1;min-width:0}
+.hud .lvl small{display:block;font-size:.8rem;opacity:.95;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{height:10px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--yellow);border-radius:99px;transition:width .5s}
+.iconbtn{background:rgba(255,255,255,.15);border:0;color:#fff;border-radius:12px;min-width:44px;min-height:44px;font-size:1.2rem}
+.iconbtn:hover{background:rgba(255,255,255,.28)}
+main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
+h2{margin:.2em 0 .5em;font-size:1.5rem}
+h3{margin:.2em 0 .4em}
+.sub{color:var(--muted);margin:0 0 1em}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px}
+.grid{display:grid;gap:14px}
+.menu{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.tile{text-align:left;background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:16px;display:block;width:100%;transition:transform .12s,border-color .12s}
+.tile:hover{transform:translateY(-2px);border-color:var(--blue)}
+.tile .em{font-size:2rem;display:block}
+.tile b{display:block;font-size:1.15rem;margin:.2em 0}
+.tile span.d{color:var(--muted);font-size:.95rem}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:12px;padding:12px 20px;min-height:48px;font-weight:700}
+.btn:hover{background:var(--blue-d)}
+.btn.alt{background:var(--yellow);color:#14213d}
+.btn.alt:hover{background:#ffd93d}
+.btn.ghost{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 16px}
+.chip{background:var(--card);border:2px solid var(--line);border-radius:99px;padding:8px 14px;min-height:44px}
+.chip[aria-pressed=true]{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:700}
+.stat{display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:12px;font-weight:700}
+.stat .grow{flex:1}
+.q{font-size:1.2rem;font-weight:600}
+.q.big{font-size:1.8rem;text-align:center;padding:10px 0}
+.tag{display:inline-block;background:var(--blue-l);color:var(--blue-d);border-radius:99px;padding:2px 12px;font-size:.85rem;font-weight:700;margin-bottom:8px}
+.opts{display:grid;gap:10px;margin-top:14px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px 14px;min-height:56px;width:100%}
+.opt:hover:not(:disabled){border-color:var(--blue);background:var(--blue-l)}
+.opt .k{background:var(--blue-l);color:var(--blue-d);border-radius:8px;min-width:30px;height:30px;display:grid;place-items:center;font-weight:800;flex:none}
+.opt.right{background:var(--ok-bg);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-bg);border-color:var(--bad)}
+.opt:disabled{cursor:default}
+.fb{margin-top:14px;padding:12px 14px;border-radius:12px;font-weight:600}
+.fb.ok{background:var(--ok-bg);color:#0d4a1f}
+.fb.bad{background:var(--bad-bg);color:#7a1610}
+.fb p{margin:.3em 0 0;font-weight:400}
+.mem{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.mc{min-height:104px;border-radius:14px;border:2px solid var(--blue);background:var(--blue);color:#fff;font-size:1.8rem;display:grid;place-items:center;padding:8px;text-align:center}
+.mc.open{background:var(--card);color:var(--ink);border-color:var(--line);font-size:.92rem;line-height:1.3;font-weight:600}
+.mc.open.term{background:var(--yellow);border-color:var(--yellow-d);font-size:1.05rem;font-weight:800}
+.mc.done{background:var(--ok-bg);border-color:var(--ok);color:#0d4a1f}
+.mc.pop{animation:pop .25s}
+@keyframes pop{50%{transform:scale(1.06)}}
+.sortcard{font-size:1.5rem;font-weight:800;text-align:center;padding:26px 12px;background:var(--yellow);border-radius:var(--r);border:2px solid var(--yellow-d);margin:10px 0 14px}
+.buckets{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.bucket{background:var(--blue);color:#fff;border:0;border-radius:14px;padding:16px 10px;font-weight:800;min-height:64px}
+.bucket:hover:not(:disabled){background:var(--blue-d)}
+.bucket.right{background:var(--ok)}
+.bucket.wrong{background:var(--bad)}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.list{display:grid;gap:10px}
+details.t{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:0}
+details.t summary{padding:12px 14px;font-weight:700;cursor:pointer;min-height:48px;display:flex;align-items:center;gap:8px}
+details.t[open]{border-color:var(--blue)}
+details.t .d{padding:0 14px 14px;color:var(--ink)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--line);flex:none}
+.dot.m{background:var(--ok)}
+input[type=search],textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+textarea{min-height:90px;resize:vertical}
+label.f{display:block;font-weight:700;margin:12px 0 4px}
+.hint{color:var(--muted);font-size:.92rem;margin:0 0 4px}
+.model{background:var(--blue-l);border-radius:12px;padding:12px 14px;margin:8px 0}
+.model p{margin:.2em 0}
+.pts{list-style:none;padding:0;margin:8px 0}
+.pts li label{display:flex;gap:10px;align-items:flex-start;padding:6px 0;min-height:40px}
+.pts input{width:22px;height:22px;flex:none;margin-top:2px}
+.prog{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin:4px 0 10px}
+.prog>i{display:block;height:100%;background:var(--blue)}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.badge{border:2px dashed var(--line);border-radius:14px;padding:10px;text-align:center;color:var(--muted);font-size:.88rem}
+.badge.on{border:2px solid var(--yellow-d);background:#fff8d6;color:var(--ink)}
+.badge .em{font-size:1.8rem;display:block;filter:grayscale(1);opacity:.45}
+.badge.on .em{filter:none;opacity:1}
+.stars{font-size:2.4rem;letter-spacing:6px;color:var(--yellow-d)}
+.center{text-align:center}
+.done-tag{color:var(--ok);font-weight:800}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,120px);background:var(--ink);color:#fff;padding:12px 20px;border-radius:14px;z-index:30;transition:transform .3s;max-width:90vw;text-align:center;font-weight:700}
+#toast.show{transform:translate(-50%,0)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:20}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.hero{background:linear-gradient(135deg,#0b1033,#2a2f8f);color:#fff;border-radius:var(--r);padding:8px 20px 14px;margin-bottom:16px}
+.hero h2{margin-top:.5em}.hero p{margin:0;opacity:.95}
+.slots{margin:6px 0;padding-left:30px}
+.slot{background:var(--ok-bg);border:2px solid var(--ok);color:#0d4a1f;border-radius:12px;padding:8px 12px;margin:6px 0;font-weight:600}
+.pool{display:grid;gap:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="hud">
+    <button class="iconbtn" id="back" aria-label="Tillbaka till menyn" hidden>←</button>
+    <h1>🚀 Rymdspelet</h1>
+    <div class="lvl">
+      <small id="lvlname"></small>
+      <div class="bar" role="progressbar" aria-label="Erfarenhetspoäng till nästa nivå" aria-valuemin="0" aria-valuemax="100" id="xpbar"><i id="xpfill"></i></div>
+    </div>
+    <button class="iconbtn" id="snd" aria-label="Ljud av/på" aria-pressed="true">🔊</button>
+  </div>
+</header>
+<main id="app"></main>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============ DATA (från Instudering-astronomi.pdf) ============ */
+const SECTIONS={1:"Solsystemet",2:"Big Bang & universum",3:"Stjärnor"};
+const TERMS=[
+// 1 Solsystemet
+{sec:1,t:"Planet",d:"En klotformad kropp som rör sig i en bana runt en stjärna utan att lysa av sig själv.",s:"Klotformad kropp i bana runt en stjärna – lyser inte själv"},
+{sec:1,t:"Asteroid",d:"Ett mindre objekt av sten och metall i bana runt solen.",s:"Mindre objekt av sten och metall i bana runt solen"},
+{sec:1,t:"Komet",d:"En himlakropp av is och stoft som får en lysande svans nära solen.",s:"Himlakropp av is och stoft som får en lysande svans"},
+{sec:1,t:"Stenplaneter",x:1,d:"De fyra innersta planeterna (Merkurius, Venus, Jorden och Mars). De är små och har en fast yta av sten och metall.",s:"De fyra inre planeterna med fast yta av sten"},
+{sec:1,t:"Jätteplaneter",x:1,d:"De fyra yttersta planeterna (Jupiter, Saturnus, Uranus och Neptunus). De är mycket stora och består mest av gas (och is), inte av fast sten.",s:"De fyra yttre, jättestora planeterna som mest är gas"},
+{sec:1,t:"Dvärgplanet",x:1,d:"Ett runt objekt som kretsar runt solen men är för litet och inte har rensat sin bana från andra objekt. Exempel: Pluto.",s:"Litet runt objekt som inte rensat sin bana, t.ex. Pluto"},
+{sec:1,t:"Växthuseffekt",x:1,d:"När gaser i atmosfären (t.ex. koldioxid) fångar värme så att planeten blir varmare. På Venus är den extremt stark.",s:"Gaser i atmosfären fångar värme så planeten blir varmare"},
+// 2 Big Bang & universum
+{sec:2,t:"The Big Bang",d:"Explosionen/expansionen för 13,8 miljarder år sedan som startade universum.",s:"Expansionen för 13,8 miljarder år sedan som startade universum"},
+{sec:2,t:"Galax",d:"En enorm samling stjärnor, gas och mörk materia hophållen av gravitation.",s:"Enorm samling stjärnor, gas och mörk materia hållen av gravitation"},
+{sec:2,t:"Kosmisk bakgrundsstrålning",x:1,d:"Det svaga ”ekot” från Big Bang som fortfarande kan mätas i rymden.",s:"Det svaga ”ekot” från Big Bang som vi kan mäta i rymden"},
+// 3 Stjärnor
+{sec:3,t:"Stjärna",d:"Ett lysande gasklot som skapar egen energi genom kärnfusion.",s:"Lysande gasklot som skapar egen energi genom kärnfusion"},
+{sec:3,t:"Kärnfusion",x:1,d:"När väteatomer slås ihop till helium och enorma mängder energi frigörs. Så får stjärnor sin energi och sitt ljus.",s:"Väte slås ihop till helium och energi frigörs"},
+{sec:3,t:"Nebulosa",d:"Ett stort moln av gas och stoft där stjärnor föds eller dör.",s:"Stort moln av gas och stoft där stjärnor föds eller dör"},
+{sec:3,t:"Röd jätte",d:"En uppsvälld, svalare stjärna i slutskedet av sitt liv.",s:"Uppsvälld, svalare stjärna i slutskedet av sitt liv"},
+{sec:3,t:"Vit dvärgstjärna",d:"Den täta, svalnande restkärnan från en mindre eller medelstor stjärna.",s:"Tät, svalnande restkärna från en mindre eller medelstor stjärna"},
+{sec:3,t:"Supernova",d:"En våldsam explosion när en massiv stjärna dör.",s:"Våldsam explosion när en massiv stjärna dör"},
+{sec:3,t:"Svart hål",d:"En punkt i rymden med så stark gravitation att inte ens ljus slipper ut.",s:"Plats med så stark gravitation att inte ens ljus slipper ut"}
+].map((x,i)=>({...x,id:"t"+i}));
+const READY=Math.ceil(TERMS.length*.8);
+
+const FACTS=[
+{sec:1,q:"Hur stor del av solsystemets massa finns i solen?",a:"Nästan allt – ca 99,8 %",w:["Ungefär hälften – 50 %","Ungefär 10 %","Ungefär 1 %"],e:"Solen har ca 99,8 % av massan. Planeter, månar m.m. är bara en liten rest."},
+{sec:1,q:"Vilka två grupper delas solsystemets åtta planeter in i?",a:"Stenplaneter och jätteplaneter (gasjättar)",w:["Varma och kalla planeter","Planeter med och utan månar","Inre och yttre dvärgplaneter"],e:"Stenplaneter närmast solen, jätteplaneter längre ut."},
+{sec:1,q:"Varför är Venus varmare än Merkurius, trots att Venus ligger längre från solen?",a:"Venus har en tjock atmosfär som ger en kraftig växthuseffekt",w:["Venus roterar snabbare än Merkurius","Venus har en egen värmekälla inuti","Solen lyser starkare på Venus"],e:"Atmosfären håller kvar värmen dag som natt. Merkurius saknar nästan atmosfär."},
+{sec:1,q:"Vilken är den största planeten i solsystemet?",a:"Jupiter",w:["Saturnus","Neptunus","Jorden"],e:"Jupiter är störst."},
+{sec:1,q:"Vad är gemensamt för jätteplaneterna?",a:"De är mycket stora och består mest av gas",w:["De har en fast yta som Jorden","De saknar månar","De ligger närmast solen"],e:"Jätteplaneterna är stora gasplaneter, ofta med ringar och många månar."},
+{sec:1,q:"Varför är Pluto en dvärgplanet?",a:"Den är liten och har inte rensat sin bana från andra objekt",w:["Den har lämnat solsystemet","Den lyser av sig själv","Den kretsar inte runt solen"],e:"Pluto uppfyller inte alla krav för att vara en vanlig planet."},
+{sec:1,q:"Varför ser vi planeterna lysa på natthimlen?",a:"De reflekterar solens ljus",w:["De skapar egen energi med kärnfusion","De är så heta att de glöder","De är täckta av is som lyser i mörkret"],e:"Planeter lyser inte själva – de kastar tillbaka solljus."},
+{sec:2,q:"För ungefär hur länge sedan skedde Big Bang?",a:"13,8 miljarder år sedan",w:["4,6 miljarder år sedan","138 miljoner år sedan","13,8 tusen år sedan"],e:"Big Bang startade universum för 13,8 miljarder år sedan."},
+{sec:2,q:"Vilka två grundämnen bildades först efter Big Bang?",a:"Väte och helium",w:["Syre och kol","Järn och guld","Kväve och neon"],e:"Väte och helium är fortfarande 99 % av den synliga materien."},
+{sec:2,q:"Vad kallas ”ekot” från Big Bang som vi fortfarande kan mäta?",a:"Kosmisk bakgrundsstrålning",w:["Solvind","Gravitationsvåg","Nordsken"],e:"Kosmisk bakgrundsstrålning är ett svagt eko från Big Bang."},
+{sec:2,q:"Vad händer med universums temperatur när det expanderar?",a:"Den sjunker – universum blir kallare",w:["Den stiger","Den förblir exakt densamma","Den svänger upp och ner"],e:"När universum expanderar sprids energin ut och det svalnar."},
+{sec:3,q:"Vad kallas molnen av gas och stoft där stjärnor föds?",a:"Nebulosor",w:["Galaxer","Kometer","Asteroidbälten"],e:"Stjärnor föds i nebulosor."},
+{sec:3,q:"Vad startar när temperaturen i mitten av ett hopdraget gasmoln blir tillräckligt hög?",a:"Kärnfusion",w:["En supernova","Ett svart hål","En röd jätte"],e:"Då slås väte ihop till helium och en stjärna är född."},
+{sec:3,q:"Vad händer med en mindre eller medelstor stjärna (som solen) när bränslet tar slut?",a:"Den sväller till en röd jätte och blir sedan en vit dvärg",w:["Den exploderar som en supernova","Den blir direkt ett svart hål","Den slocknar och försvinner genast"],e:"Solen blir en röd jätte och sedan en vit dvärgstjärna."},
+{sec:3,q:"Vad kallas explosionen när en mycket massiv stjärna dör?",a:"Supernova",w:["Big Bang","Nebulosa","Kometsvans"],e:"En massiv stjärna dör i en supernova."}
+].map((x,i)=>({...x,id:"f"+i}));
+
+const SORTS=[
+{id:"typ",name:"Stenplanet eller jätteplanet?",em:"🪐",buckets:["Stenplanet","Jätteplanet"],items:[
+["Merkurius",0],["Venus",0],["Jorden",0],["Mars",0],["Fast yta av sten och metall",0],["Liten och nära solen",0],
+["Jupiter",1],["Saturnus",1],["Uranus",1],["Neptunus",1],["Består mest av gas",1],["Stor – med många månar och ringar",1]]},
+{id:"himla",name:"Planet, asteroid eller komet?",em:"☄️",buckets:["Planet","Asteroid","Komet"],items:[
+["Jorden",0],["Klotformad kropp i bana runt en stjärna",0],["Saturnus",0],
+["Mindre objekt av sten och metall",1],["Bälte mellan Mars och Jupiter",1],["Sten och metall i bana runt solen",1],
+["Is och stoft",2],["Får en lysande svans nära solen",2],["Halleys komet",2]]},
+{id:"lys",name:"Lyser själv eller reflekterar solljus?",em:"✨",buckets:["Lyser själv","Reflekterar solljus"],items:[
+["Solen",0],["Sirius (en stjärna)",0],["Stjärnorna på natthimlen",0],["Ljuset kommer från kärnfusion",0],
+["Mars",1],["Venus",1],["Jupiter",1],["Månen",1],["Planeterna vi ser på natthimlen",1]]},
+{id:"stjarna",name:"Liten eller massiv stjärna?",em:"🌟",buckets:["Liten/medelstor (som solen)","Mycket massiv stjärna"],items:[
+["Vår sol",0],["Blir en röd jätte",0],["Slutar som vit dvärgstjärna",0],["Yttre lagren försvinner och kärnan svalnar",0],
+["Dör i en supernova",1],["Kan bli ett svart hål",1],["Våldsam explosion i slutet",1]]}
+];
+
+const ORDERS=[
+{id:"planeter",name:"Planeterna – från solen och utåt",em:"🪐",hint:"Börja med planeten närmast solen.",items:["Merkurius","Venus","Jorden","Mars","Jupiter","Saturnus","Uranus","Neptunus"]},
+{id:"stjarnliv",name:"En sols-liknande stjärnas liv",em:"🌞",hint:"Från födelse till död.",items:["Nebulosa (stort moln av gas och stoft)","Gravitationen drar ihop gasen – den blir tät och het","Kärnfusion startar – en stjärna är född","Bränslet tar slut – stjärnan sväller till en röd jätte","Kvar blir en vit dvärgstjärna som svalnar"]},
+{id:"bigbang",name:"Universums historia",em:"💥",hint:"Börja med Big Bang.",items:["Big Bang","Universum expanderar och svalnar","Väte och helium bildas","Stjärnor och galaxer bildas"]}
+];
+
+const REASON=[
+{id:"a1",grp:"Solsystemet (fil 6)",kind:"kort",t:"Solens massa",q:"Hur många procent av solsystemets totala massa finns i solen?",parts:[
+ {label:"Ditt svar",model:"Nästan allt – ungefär 99,8 %. Alla planeter, månar, asteroider och kometer tillsammans är bara en liten rest.",note:"Siffran kan stå som 99,8 % eller 99,9 % i Meitner – kolla vad ni har.",points:["Ungefär 99,8 % (nästan 100 %)","Resten är planeter, månar m.m."]}]},
+{id:"a2",grp:"Solsystemet (fil 6)",kind:"kort",t:"Planeternas två grupper",q:"Solsystemet har åtta planeter som delas in i två grupper. Vad kallas de två grupperna?",parts:[
+ {label:"Ditt svar",model:"Stenplaneter (de jordlika planeterna: Merkurius, Venus, Jorden, Mars) och jätteplaneter / gasjättar (Jupiter, Saturnus, Uranus, Neptunus).",note:"Boken kan använda orden jordlika planeter och gasplaneter – kolla.",points:["Stenplaneter (de fyra inre)","Jätteplaneter / gasjättar (de fyra yttre)"]}]},
+{id:"a3",grp:"Solsystemet (fil 6)",kind:"forklara",t:"Varför är Venus varmast?",q:"På Merkurius är det +430 °C på solsidan men –180 °C på skuggsidan. På Venus, som ligger längre från solen, är det cirka +460 °C hela tiden. Förklara varför Venus är varmare än Merkurius dygnet runt, trots att den ligger längre från solen.",parts:[
+ {label:"Förklaring",hint:"Tänk på atmosfären och växthuseffekten.",model:"Venus har en mycket tjock atmosfär av koldioxid som ger en kraftig växthuseffekt. Atmosfären fångar värmen och släpper inte ut den, och den fördelar värmen över hela planeten – därför är det lika varmt på dagsidan som på nattsidan. Merkurius har nästan ingen atmosfär, så värmen försvinner ut i rymden på nattsidan och det blir iskallt.",points:["Venus har en tjock atmosfär (koldioxid)","Växthuseffekt: värmen fångas och stannar kvar","Värmen sprids – lika varmt dag och natt","Merkurius saknar atmosfär – värmen försvinner på nattsidan"]}]},
+{id:"b1",grp:"Solsystemet (fil 7)",kind:"kort",t:"Största planeten",q:"Vilken planet är störst i vårt solsystem?",parts:[
+ {label:"Ditt svar",model:"Jupiter.",points:["Jupiter"]}]},
+{id:"b2",grp:"Solsystemet (fil 7)",kind:"kort",t:"Jätteplaneternas egenskaper",q:"Nämn två egenskaper som är gemensamma för jätteplaneterna.",parts:[
+ {label:"Ditt svar",model:"De är mycket stora och består mest av gas, så de har ingen fast yta som Jorden. De har också många månar och ringar.",note:"Du behöver bara två – kryssa i de du hade med.",points:["Mycket stora","Består mest av gas (ingen fast yta)","Många månar","Har ringar"]}]},
+{id:"b3",grp:"Solsystemet (fil 7)",kind:"forklara",t:"Varför är Pluto en dvärgplanet?",q:"Varför räknas Pluto inte längre som en vanlig planet utan som en dvärgplanet?",parts:[
+ {label:"Förklaring",model:"Pluto är mycket liten och har inte rensat sin bana från andra objekt – den delar sin bana med många andra himlakroppar. År 2006 bestämde astronomerna att en vanlig planet måste ha rensat sin bana, och därför blev Pluto en dvärgplanet.",points:["Pluto är liten","Har inte rensat sin bana från andra objekt","Astronomerna bestämde nya regler (2006)"]}]},
+{id:"b4",grp:"Solsystemet (fil 7)",kind:"forklara",t:"Varför lyser planeterna?",q:"Varför lyser planeterna när vi ser dem på natthimlen, trots att de inte lyser av sig själva?",parts:[
+ {label:"Förklaring",model:"Planeterna lyser inte själva. Solljus träffar planeten och reflekteras (studsar tillbaka) mot oss, så vi ser planeten som en ljus prick. Stjärnor däremot lyser själva eftersom de skapar egen energi genom kärnfusion.",points:["Planeter lyser inte själva","De reflekterar solens ljus","Stjärnor lyser själva (kärnfusion)"]}]},
+{id:"c1",grp:"Big Bang (fil 8)",kind:"kort",t:"När skedde Big Bang?",q:"För ungefär hur länge sedan skedde Big Bang?",parts:[
+ {label:"Ditt svar",model:"För ungefär 13,8 miljarder år sedan.",points:["13,8 miljarder år sedan"]}]},
+{id:"c2",grp:"Big Bang (fil 8)",kind:"kort",t:"De två första grundämnena",q:"Vilka två lätta grundämnen bildades först och utgör fortfarande 99 procent av den synliga materian i universum?",parts:[
+ {label:"Ditt svar",model:"Väte och helium.",points:["Väte","Helium"]}]},
+{id:"c3",grp:"Big Bang (fil 8)",kind:"kort",t:"Ekot från Big Bang",q:"Vad kallas det ”eko” från Big Bang som man fortfarande kan mäta i rymden?",parts:[
+ {label:"Ditt svar",model:"Kosmisk bakgrundsstrålning.",note:"Om ni fått ett annat namn i Meitner (t.ex. mikrovågsbakgrund) – skriv det också.",points:["Kosmisk bakgrundsstrålning"]}]},
+{id:"c4",grp:"Big Bang (fil 8)",kind:"kort",t:"Universums temperatur",q:"Vad händer med universums temperatur i takt med att det expanderar?",parts:[
+ {label:"Ditt svar",model:"Temperaturen sjunker – universum blir kallare och kallare när det expanderar, eftersom energin sprids ut över en allt större yta.",points:["Temperaturen sjunker / det blir kallare","Beror på att universum expanderar"]}]},
+{id:"d1",grp:"Stjärnor (en stjärnas livscykel)",kind:"kort",t:"Där stjärnor föds",q:"Vad kallas de stora moln av gas och stoft/damm ute i rymden där stjärnor föds?",parts:[
+ {label:"Ditt svar",model:"Nebulosor (singular: nebulosa).",points:["Nebulosa"]}]},
+{id:"d2",grp:"Stjärnor (en stjärnas livscykel)",kind:"forklara",t:"Hur bildas en stjärna?",q:"Stjärnor bildas ur stora gasmoln. Förklara hur en stjärna bildas ur ett gasmoln.",parts:[
+ {label:"Förklaring",hint:"Tänk: gravitation → tryck och värme → kärnfusion.",model:"Gravitationen drar ihop gas och stoft i nebulosan till klumpar. Klumpen blir tätare och mycket varmare, särskilt i mitten. När temperaturen blir tillräckligt hög (miljontals grader) startar kärnfusion: väte slås ihop till helium och energi frigörs. Då börjar gasklotet lysa – en stjärna är född.",points:["Gravitationen drar ihop gasen","Det blir tätare och varmare i mitten","Kärnfusion startar (väte → helium)","Energin gör att stjärnan lyser"]}]},
+{id:"d3",grp:"Stjärnor (en stjärnas livscykel)",kind:"kort",t:"Vad händer med solen?",q:"Vad händer med en mindre eller medelstor stjärna (som vår sol) när dess bränsle tar slut?",parts:[
+ {label:"Ditt svar",model:"Stjärnan sväller upp och blir en röd jätte. Därefter blåses de yttre lagren av och kvar blir den täta, heta kärnan: en vit dvärgstjärna som sakta svalnar.",points:["Blir en röd jätte","Blir sedan en vit dvärgstjärna"]}]},
+{id:"d4",grp:"Stjärnor (en stjärnas livscykel)",kind:"kort",t:"Explosionen när en stor stjärna dör",q:"Vad kallas den gigantiska explosion som sker när en mycket massiv stjärna dör?",parts:[
+ {label:"Ditt svar",model:"Supernova. Efter en supernova kan det bli kvar ett svart hål.",points:["Supernova"]}]}
+];
+
+const LEVELS=[[0,"Rymdkadett"],[100,"Astronaut"],[250,"Raketpilot"],[450,"Rymdkapten"],[700,"Stjärnforskare"],[1000,"Astronomimästare"]];
+const BADGES=[
+{id:"first",em:"🚀",n:"Uppskjutning",d:"Spela en omgång"},
+{id:"quiz10",em:"💯",n:"Fullpoängare",d:"Alla rätt i ett quiz"},
+{id:"combo",em:"🔥",n:"Ostoppbar",d:"5 rätt i rad"},
+{id:"memory",em:"🧠",n:"Minnesproffs",d:"Memory på högst 8 drag"},
+{id:"sorter",em:"🗂️",n:"Sorteringsmästare",d:"Sortera utan fel"},
+{id:"ordna",em:"🪐",n:"Planetordnaren",d:"Ordna en serie utan fel"},
+{id:"tank",em:"🔭",n:"Förklararen",d:"Klara alla ”Förklara”-frågor"},
+{id:"lvl3",em:"👩‍🚀",n:"Raketpilot",d:"Nå nivå 3"},
+{id:"ready",em:"🏆",n:"Provklar",d:`Bemästra ${READY} begrepp`}
+];
+
+/* ============ HJÄLPARE & TILLSTÅND ============ */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+function h(tag,props,...kids){
+  const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(props||{})){
+    if(k==="class")e.className=v;
+    else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);
+    else if(v===true)e.setAttribute(k,"");
+    else if(v!==false&&v!=null)e.setAttribute(k,v);
+  }
+  for(const c of kids.flat()){if(c==null||c===false)continue;e.append(c.nodeType?c:document.createTextNode(c))}
+  return e;
+}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function wsample(items,k,wf){
+  const arr=items.slice(),out=[];
+  while(out.length<k&&arr.length){
+    const ws=arr.map(wf);let r=Math.random()*ws.reduce((a,b)=>a+b,0),i=0;
+    for(;i<arr.length-1;i++){r-=ws[i];if(r<=0)break}
+    out.push(arr.splice(i,1)[0]);
+  }
+  return out;
+}
+const KEY="rymdspelet-astronomi-v1";
+const S={xp:0,mastery:{},badges:[],done:{},sound:true};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const mOf=id=>S.mastery[id]||{ok:0,bad:0};
+const mastered=id=>{const m=mOf(id);return m.ok>=2&&m.ok>m.bad};
+const weight=id=>{const m=mOf(id);return Math.min(6,Math.max(.25,1+m.bad*1.5-m.ok*.4))};
+function record(id,ok){const m=S.mastery[id]||(S.mastery[id]={ok:0,bad:0});ok?m.ok++:m.bad++;save()}
+const masteredCount=()=>TERMS.filter(t=>mastered(t.id)).length;
+
+function levelInfo(xp){
+  let i=0;for(let k=0;k<LEVELS.length;k++)if(xp>=LEVELS[k][0])i=k;
+  const cur=LEVELS[i][0],nxt=LEVELS[i+1]?LEVELS[i+1][0]:null;
+  return{i,name:LEVELS[i][1],pct:nxt?Math.round((xp-cur)/(nxt-cur)*100):100,nxt};
+}
+function hud(){
+  const L=levelInfo(S.xp);
+  $("#lvlname").textContent=`Nivå ${L.i+1}: ${L.name} · ${S.xp} XP`+(L.nxt?` (nästa vid ${L.nxt})`:"");
+  $("#xpfill").style.width=L.pct+"%";
+  $("#xpbar").setAttribute("aria-valuenow",L.pct);
+  $("#snd").textContent=S.sound?"🔊":"🔇";
+  $("#snd").setAttribute("aria-pressed",String(S.sound));
+}
+function addXp(n){
+  if(n<=0)return;
+  const before=levelInfo(S.xp).i;
+  S.xp+=n;save();hud();
+  const L=levelInfo(S.xp);
+  if(L.i>before){toast(`🎉 Ny nivå: ${L.name}!`);sfx.win();confetti();if(L.i>=2)unlock("lvl3")}
+}
+let toastT;
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2800)}
+function unlock(id){
+  if(S.badges.includes(id))return;
+  S.badges.push(id);save();
+  const b=BADGES.find(x=>x.id===id);
+  setTimeout(()=>{toast(`${b.em} Ny bricka: ${b.n}!`);sfx.win()},400);
+}
+function played(){unlock("first");if(masteredCount()>=READY)unlock("ready")}
+
+/* ljud & konfetti */
+let ac;
+function tone(f,d,type="sine",t0=0,vol=.15){
+  if(!S.sound)return;
+  try{
+    ac=ac||new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+t0;
+    o.type=type;o.frequency.value=f;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d);
+  }catch(e){}
+}
+const sfx={ok(){tone(660,.12);tone(880,.18,"sine",.1)},bad(){tone(180,.3,"sawtooth",0,.07)},win(){[523,659,784,1047].forEach((f,i)=>tone(f,.22,"triangle",i*.12))},flip(){tone(440,.05,"square",0,.04)}};
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+function confetti(){
+  if(reduce)return;
+  const c=$("#fx"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+  const cols=["#005293","#fecb00","#ffffff","#2e9b4f","#e0457b"];
+  const ps=Array.from({length:130},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*13-3,s:5+Math.random()*7,c:cols[Math.floor(Math.random()*cols.length)],r:Math.random()*6}));
+  let f=0;
+  (function tick(){
+    x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.2;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore()});
+    if(++f<130)requestAnimationFrame(tick);else x.clearRect(0,0,c.width,c.height);
+  })();
+}
+
+/* ============ NAVIGERING ============ */
+let keyHandler=null,cleanup=null;
+document.addEventListener("keydown",e=>{if(keyHandler&&!(e.target.matches&&e.target.matches("textarea,input")))keyHandler(e)});
+function go(view,arg){
+  keyHandler=null;if(cleanup){cleanup();cleanup=null}
+  app.replaceChildren();
+  $("#back").hidden=view==="home";
+  VIEWS[view](arg);
+  window.scrollTo(0,0);
+}
+$("#back").onclick=()=>go("home");
+$("#snd").onclick=()=>{S.sound=!S.sound;save();hud();if(S.sound)sfx.ok()};
+
+function sectionPicker(onStart,label="Starta"){
+  let sel=0;
+  const chips=h("div",{class:"chips",role:"group","aria-label":"Välj avsnitt"});
+  const draw=()=>{
+    chips.replaceChildren(...[[0,"Alla avsnitt"],...Object.entries(SECTIONS).map(([k,v])=>[+k,`${k}. ${v}`])].map(([k,v])=>
+      h("button",{class:"chip","aria-pressed":String(sel===k),onclick:()=>{sel=k;draw()}},v)));
+  };
+  draw();
+  return h("div",{},chips,h("button",{class:"btn alt",onclick:()=>onStart(sel)},label+" ▶"));
+}
+const termsFor=sec=>sec?TERMS.filter(t=>t.sec===sec):TERMS;
+function results({title,stars,lines,again,extra}){
+  app.replaceChildren(h("div",{class:"card center"},
+    h("h2",{},title),
+    stars!=null?h("div",{class:"stars","aria-label":`${stars} av 3 stjärnor`},"★".repeat(stars)+"☆".repeat(3-stars)):null,
+    ...lines.map(l=>h("p",{},l)),
+    extra||null,
+    h("div",{class:"row",style:"justify-content:center;margin-top:12px"},
+      h("button",{class:"btn alt",onclick:again},"Spela igen"),
+      h("button",{class:"btn ghost",onclick:()=>go("home")},"Till menyn"))));
+  window.scrollTo(0,0);
+}
+
+/* ============ HEM ============ */
+const VIEWS={};
+VIEWS.home=()=>{
+  const mc=masteredCount();
+  const tiles=[
+    ["⚡","Quiz","10 snabba frågor. Fel svar kostar ett liv – du har tre.","quiz"],
+    ["🃏","Memory","Para ihop begrepp och förklaring.","memory"],
+    ["🗂️","Sortera","Stenplanet eller jätteplanet? Planet, asteroid eller komet? Tryck på rätt låda.","sort"],
+    ["🪐","Ordna","Lägg planeterna och stjärnans liv i rätt ordning.","order"],
+    ["🔭","Fråga & svar","Provets frågor: skriv ditt eget svar och jämför.","reason"],
+    ["📖","Plugga begrepp",`Alla ${TERMS.length} begrepp att bläddra i och söka bland.`,"study"]
+  ];
+  app.append(
+    h("div",{class:"hero"},h("h2",{},"Redo för provet? 🚀"),h("p",{},"Astronomi: solsystemet, Big Bang och stjärnornas liv. Spela, samla XP och bli Astronomimästare. Spelet lär sig vilka begrepp du är osäker på och frågar mer om dem.")),
+    h("div",{class:"grid menu"},tiles.map(([em,n,d,v])=>h("button",{class:"tile",onclick:()=>go(v)},h("span",{class:"em","aria-hidden":"true"},em),h("b",{},n),h("span",{class:"d"},d)))),
+    h("h3",{style:"margin-top:26px"},`Du kan ${mc} av ${TERMS.length} begrepp`),
+    h("p",{class:"hint"},"Ett begrepp räknas som bemästrat när du svarat rätt på det minst två gånger (och oftare rätt än fel)."),
+    h("div",{class:"card"},Object.entries(SECTIONS).map(([k,v])=>{
+      const ts=TERMS.filter(t=>t.sec===+k),m=ts.filter(t=>mastered(t.id)).length;
+      return h("div",{},h("div",{class:"row"},h("b",{},`${k}. ${v}`),h("span",{class:"hint",style:"margin-left:auto"},`${m}/${ts.length}`)),h("div",{class:"prog"},h("i",{style:`width:${m/ts.length*100}%`})));
+    })),
+    h("h3",{style:"margin-top:26px"},"Brickor"),
+    h("div",{class:"badges"},BADGES.map(b=>{const on=S.badges.includes(b.id);return h("div",{class:"badge"+(on?" on":"")},h("span",{class:"em","aria-hidden":"true"},b.em),h("b",{},b.n),h("div",{},on?"Upplåst!":b.d))})),
+    h("p",{style:"margin-top:24px"},h("button",{class:"btn ghost",onclick:()=>{if(confirm("Nollställa all framgång?")){Object.assign(S,{xp:0,mastery:{},badges:[],done:{}});save();hud();go("home")}}},"Nollställ framsteg"))
+  );
+};
+
+/* ============ QUIZ ============ */
+function termQ(t){
+  const same=TERMS.filter(x=>x.sec===t.sec&&x.id!==t.id);
+  let d=shuffle(same).slice(0,3);
+  if(d.length<3)d=d.concat(shuffle(TERMS.filter(x=>x.id!==t.id&&!d.includes(x))).slice(0,3-d.length));
+  if(Math.random()<.5)return{id:t.id,tag:"Vilket begrepp beskrivs?",prompt:t.d,opts:shuffle([{text:t.t,ok:true},...d.map(x=>({text:x.t}))]),explain:`Rätt svar: ${t.t}.`};
+  return{id:t.id,tag:"Vad betyder begreppet?",prompt:t.t,big:true,opts:shuffle([{text:t.s,ok:true},...d.map(x=>({text:x.s}))]),explain:`${t.t}: ${t.d}`};
+}
+const factQ=f=>({id:f.id,tag:"Fakta",prompt:f.q,opts:shuffle([{text:f.a,ok:true},...f.w.map(text=>({text}))]),explain:f.e});
+VIEWS.quiz=()=>{
+  app.append(h("h2",{},"⚡ Quiz"),h("p",{class:"sub"},"Välj avsnitt. Tips: tangenterna 1–4 svarar, Enter går vidare."),sectionPicker(playQuiz));
+};
+function playQuiz(sec){
+  const cands=[...termsFor(sec).map(t=>({t})),...FACTS.filter(f=>!sec||f.sec===sec).map(f=>({f}))];
+  const qs=wsample(cands,Math.min(10,cands.length),c=>c.t?weight(c.t.id):1.2).map(c=>c.t?termQ(c.t):factQ(c.f));
+  let i=0,hearts=3,score=0,streak=0,bestStreak=0,xpGain=0,answered=false;const missed=[];
+  function show(){
+    answered=false;const q=qs[i];
+    const optEls=q.opts.map((o,k)=>h("button",{class:"opt",onclick:()=>pick(k)},h("span",{class:"k"},String(k+1)),h("span",{},o.text)));
+    const fb=h("div",{"aria-live":"polite"});
+    const next=h("button",{class:"btn",hidden:true,onclick:advance},i+1<qs.length?"Nästa ▶":"Se resultat ▶");
+    app.replaceChildren(
+      h("div",{class:"stat"},h("span",{},`Fråga ${i+1}/${qs.length}`),h("span",{"aria-label":`${hearts} liv kvar`},"♥".repeat(hearts)+"♡".repeat(3-hearts)),h("span",{class:"grow"}),h("span",{},streak>1?`🔥 ${streak} i rad`:"")),
+      h("div",{class:"prog"},h("i",{style:`width:${i/qs.length*100}%`})),
+      h("div",{class:"card"},h("span",{class:"tag"},q.tag),h("div",{class:"q"+(q.big?" big":"")},q.prompt),h("div",{class:"opts"},optEls),fb,h("div",{style:"margin-top:12px"},next)));
+    function pick(k){
+      if(answered)return;answered=true;
+      const ok=!!q.opts[k].ok;
+      optEls.forEach((el,n)=>{el.disabled=true;if(q.opts[n].ok){el.classList.add("right");el.prepend("✓ ")}else if(n===k){el.classList.add("wrong");el.prepend("✗ ")}});
+      record(q.id,ok);
+      if(ok){
+        score++;streak++;bestStreak=Math.max(bestStreak,streak);
+        const g=10+(streak>=3?5:0);xpGain+=g;addXp(g);sfx.ok();if(streak>=5)unlock("combo");
+        fb.replaceChildren(h("div",{class:"fb ok"},`Rätt! +${g} XP`+(streak>=3?" (combo-bonus!)":""),h("p",{},q.explain)));
+      }else{
+        hearts--;streak=0;sfx.bad();missed.push(q);
+        fb.replaceChildren(h("div",{class:"fb bad"},"Inte riktigt.",h("p",{},q.explain)));
+      }
+      next.hidden=false;next.focus();
+      if(hearts<=0)next.textContent="Se resultat ▶";
+    }
+    keyHandler=e=>{
+      if(e.key>="1"&&e.key<="4"&&q.opts[+e.key-1])pick(+e.key-1);
+      else if((e.key==="Enter")&&answered)advance();
+    };
+  }
+  function advance(){
+    if(!answered)return;
+    i++;
+    if(hearts<=0||i>=qs.length)return finish();
+    show();
+  }
+  function finish(){
+    keyHandler=null;played();
+    const stars=score>=qs.length&&hearts>0?3:score>=Math.ceil(qs.length*.7)?2:score>=Math.ceil(qs.length*.4)?1:0;
+    if(score===qs.length)unlock("quiz10");
+    if(stars>=2){sfx.win();confetti()}
+    const bonus=stars*5;addXp(bonus);
+    results({
+      title:hearts<=0?"Slut på liv – men du lärde dig något!":score===qs.length?"Perfekt! 🎉":"Bra kämpat!",
+      stars,
+      lines:[`${score} av ${qs.length} rätt · bästa serie ${bestStreak} · +${xpGain+bonus} XP`],
+      extra:missed.length?h("div",{style:"text-align:left;margin-top:10px"},h("h3",{},"Repetera dessa:"),h("ul",{},missed.map(q=>h("li",{},q.explain)))):null,
+      again:()=>playQuiz(sec)
+    });
+  }
+  show();
+}
+
+/* ============ MEMORY ============ */
+VIEWS.memory=()=>{
+  app.append(h("h2",{},"🃏 Memory"),h("p",{class:"sub"},"Vänd två kort. Para ihop varje begrepp (gult) med rätt förklaring. Färre drag = fler stjärnor."),sectionPicker(playMemory));
+};
+function playMemory(sec){
+  const pool=wsample(termsFor(sec),6,t=>weight(t.id));
+  const cards=shuffle(pool.flatMap(t=>[{id:t.id,term:true,text:t.t},{id:t.id,term:false,text:t.s}]));
+  let first=null,lock=false,moves=0,pairs=0,secs=0;
+  const movesEl=h("span",{},"Drag: 0"),timeEl=h("span",{},"0 s");
+  const timer=setInterval(()=>{secs++;timeEl.textContent=secs+" s"},1000);cleanup=()=>clearInterval(timer);
+  const els=cards.map((c,k)=>{
+    const b=h("button",{class:"mc","aria-label":"Dolt kort, tryck för att vända",onclick:()=>flip(k)},"❓");
+    return b;
+  });
+  const show=(k,on)=>{
+    const c=cards[k],b=els[k];
+    b.className="mc"+(on?" open"+(c.term?" term":""):"")+(on?" pop":"");
+    b.textContent=on?c.text:"❓";
+    b.setAttribute("aria-label",on?c.text:"Dolt kort, tryck för att vända");
+  };
+  function flip(k){
+    if(lock||els[k].dataset.done||first===k)return;
+    sfx.flip();show(k,true);
+    if(first===null){first=k;return}
+    moves++;movesEl.textContent="Drag: "+moves;
+    const a=first;first=null;
+    if(cards[a].id===cards[k].id&&cards[a].term!==cards[k].term){
+      [a,k].forEach(n=>{els[n].dataset.done="1";els[n].className="mc done";els[n].disabled=true});
+      sfx.ok();addXp(5);record(cards[k].id,true);pairs++;
+      if(pairs===pool.length)finish();
+    }else{
+      lock=true;record(cards[a].id,false);record(cards[k].id,false);sfx.bad();
+      setTimeout(()=>{show(a,false);show(k,false);lock=false},1300);
+    }
+  }
+  function finish(){
+    clearInterval(timer);played();
+    const stars=moves<=9?3:moves<=14?2:1,bonus=stars*10;
+    if(moves<=8)unlock("memory");
+    sfx.win();confetti();addXp(bonus);
+    setTimeout(()=>results({title:"Alla par hittade! 🎉",stars,lines:[`${moves} drag på ${secs} sekunder · +${pairs*5+bonus} XP`],again:()=>playMemory(sec)}),1100);
+  }
+  app.replaceChildren(h("div",{class:"stat"},movesEl,timeEl),h("div",{class:"grid mem"},els));
+}
+
+/* ============ SORTERA ============ */
+VIEWS.sort=()=>{
+  app.append(h("h2",{},"🗂️ Sortera"),h("p",{class:"sub"},"Välj en sorteringsövning. Tryck på rätt låda för varje kort."),
+    h("div",{class:"grid menu"},SORTS.map(s=>h("button",{class:"tile",onclick:()=>playSort(s)},h("span",{class:"em","aria-hidden":"true"},s.em),h("b",{},s.name),h("span",{class:"d"},s.buckets.join(" · "))))));
+};
+function playSort(set){
+  const queue=shuffle(set.items).slice(0,Math.min(8,set.items.length));
+  const total=queue.length;let done=0,firstTry=0,xp=0;const retried=new Set();
+  function show(){
+    if(!queue.length)return finish();
+    const [text,right]=queue[0];let busy=false;
+    const bs=set.buckets.map((b,k)=>h("button",{class:"bucket",onclick:()=>pick(k)},b));
+    const card=h("div",{class:"sortcard"},text);
+    app.replaceChildren(
+      h("div",{class:"stat"},h("span",{},`Kort ${Math.min(done+1,total)}/${total}`),h("span",{class:"grow"}),h("span",{},`${firstTry} rätt direkt`)),
+      h("div",{class:"prog"},h("i",{style:`width:${done/total*100}%`})),
+      h("h3",{},set.name),card,h("div",{class:"buckets",role:"group","aria-label":"Välj låda"},bs));
+    function pick(k){
+      if(busy)return;busy=true;
+      bs.forEach(b=>b.disabled=true);
+      if(k===right){
+        bs[k].classList.add("right");sfx.ok();
+        if(!retried.has(text)){firstTry++;xp+=8;addXp(8)}
+        queue.shift();done++;
+        setTimeout(show,600);
+      }else{
+        bs[k].classList.add("wrong");bs[right].classList.add("right");card.classList.add("shake");sfx.bad();
+        card.append(h("div",{style:"font-size:1rem;font-weight:600;margin-top:8px"},`Rätt: ${set.buckets[right]}`));
+        retried.add(text);const it=queue.shift();queue.push(it);
+        setTimeout(show,1700);
+      }
+    }
+  }
+  function finish(){
+    played();const perfect=firstTry===total;
+    if(perfect){unlock("sorter");sfx.win();confetti()}
+    const stars=perfect?3:firstTry>=Math.ceil(total*.7)?2:1;
+    results({title:perfect?"Felfritt! 🎉":"Klart!",stars,lines:[`${firstTry} av ${total} rätt på första försöket · +${xp} XP`],again:()=>playSort(set)});
+  }
+  show();
+}
+
+/* ============ ORDNA ============ */
+VIEWS.order=()=>{
+  app.append(h("h2",{},"🪐 Ordna"),h("p",{class:"sub"},"Tryck på korten i rätt ordning, ett i taget. Fel kort studsar tillbaka."),
+    h("div",{class:"grid menu"},ORDERS.map(o=>h("button",{class:"tile",onclick:()=>playOrder(o)},h("span",{class:"em","aria-hidden":"true"},o.em),h("b",{},o.name),h("span",{class:"d"},o.items.length+" steg – "+o.hint)))));
+};
+function playOrder(o){
+  let next=0,mistakes=0;
+  const slots=h("ol",{class:"slots"});
+  const pool=h("div",{class:"pool",role:"group","aria-label":"Kort att placera"});
+  const msg=h("p",{class:"hint","aria-live":"polite"},o.hint);
+  const btns=shuffle(o.items).map(text=>{
+    const b=h("button",{class:"opt",onclick:()=>pick(text,b)},h("span",{},text));
+    return b;
+  });
+  pool.append(...btns);
+  function pick(text,b){
+    if(text===o.items[next]){
+      slots.append(h("li",{class:"slot"},text));
+      b.remove();next++;addXp(4);sfx.ok();
+      msg.textContent=next<o.items.length?"Rätt! Vilket kommer sedan?":"";
+      if(next===o.items.length)finish();
+    }else{
+      mistakes++;sfx.bad();b.classList.add("wrong","shake");
+      msg.textContent="Inte just nu – prova ett annat kort.";
+      setTimeout(()=>b.classList.remove("wrong","shake"),500);
+    }
+  }
+  function finish(){
+    played();const stars=mistakes===0?3:mistakes<=2?2:1;
+    if(mistakes===0)unlock("ordna");
+    if(stars>=2){sfx.win();confetti()}
+    addXp(stars*5);
+    setTimeout(()=>results({title:mistakes===0?"Helt rätt! 🎉":"Klart!",stars,lines:[`${mistakes} felklick · +${o.items.length*4+stars*5} XP`,"Läs ordningen en gång till:"],
+      extra:h("ol",{style:"text-align:left"},o.items.map(t=>h("li",{},t))),again:()=>playOrder(o)}),700);
+  }
+  app.replaceChildren(h("h3",{},o.name),h("div",{class:"card"},h("p",{class:"hint"},"Din ordning hittills:"),slots,msg),h("h3",{style:"margin-top:16px"},"Kort att placera"),pool);
+}
+
+/* ============ FRÅGA & SVAR ============ */
+VIEWS.reason=()=>{
+  const item=q=>h("button",{class:"tile",onclick:()=>go("reasonq",q.id)},
+    h("b",{},q.t,S.done[q.id]?h("span",{class:"done-tag"}," ✓ klar"):null),
+    h("span",{class:"d"},q.q.length>110?q.q.slice(0,107)+"…":q.q));
+  const groups=[...new Set(REASON.map(q=>q.grp))];
+  app.append(h("h2",{},"🔭 Fråga & svar"),
+    h("p",{class:"sub"},"Det här är instuderingsfrågorna från provet. Skriv ditt svar själv först, jämför sedan med förslaget och kryssa för det du hade med. ”Förklara”-frågor är de som kräver längre svar."),
+    ...groups.flatMap(g=>[h("h3",{style:"margin-top:22px"},g),h("div",{class:"grid menu"},REASON.filter(q=>q.grp===g).map(item))]));
+};
+VIEWS.reasonq=id=>{
+  const q=REASON.find(x=>x.id===id);
+  const boxes=q.parts.map(()=>[]);
+  const body=h("div");
+  const revealBtn=h("button",{class:"btn alt"},"Visa förslag på svar");
+  q.parts.forEach(p=>{
+    body.append(h("label",{class:"f"},p.label),p.hint?h("p",{class:"hint"},p.hint):null,h("textarea",{"aria-label":p.label,placeholder:"Skriv här…"}));
+  });
+  const review=h("div");
+  revealBtn.onclick=()=>{
+    revealBtn.hidden=true;
+    review.replaceChildren(h("h3",{},"Förslag på svar – jämför med ditt eget"),
+      ...q.parts.map((p,pi)=>h("div",{},
+        h("div",{class:"model"},h("b",{},p.label),h("p",{},p.model),p.note?h("p",{class:"hint"},"ℹ️ "+p.note):null),
+        h("p",{class:"hint"},"Vad hade du med?"),
+        h("ul",{class:"pts"},p.points.map(pt=>{const cb=h("input",{type:"checkbox"});boxes[pi].push(cb);return h("li",{},h("label",{},cb,h("span",{},pt)))})))),
+      h("button",{class:"btn",onclick:finish},"Klar – räkna poäng"));
+    review.scrollIntoView({behavior:reduce?"auto":"smooth"});
+  };
+  function finish(){
+    const ticked=boxes.flat().filter(c=>c.checked).length,all=boxes.flat().length;
+    const enough=q.id==="b2"?ticked>=2:ticked===all;
+    const first=!S.done[q.id];S.done[q.id]=true;save();played();
+    const xp=first?Math.min(ticked,4)*5+(enough?10:0):0;
+    addXp(xp);
+    if(REASON.filter(x=>x.kind==="forklara").every(x=>S.done[x.id]))unlock("tank");
+    if(enough){sfx.win();confetti()}else sfx.ok();
+    results({title:enough?"Starkt svar! 🎉":"Bra jobbat!",stars:enough?3:ticked>0?2:1,
+      lines:[`Du hade med ${ticked} av ${all} nyckelpunkter.`,xp?`+${xp} XP`:"(XP ges bara första gången – men repetition är bra!)",enough?"":"Läs förslaget en gång till och försök igen utan att titta."],
+      again:()=>go("reasonq",id)});
+  }
+  app.append(h("h2",{},q.t),h("div",{class:"card"},h("div",{class:"q"},q.q)),body,h("div",{style:"margin-top:14px"},revealBtn),review);
+};
+
+/* ============ PLUGGA ============ */
+VIEWS.study=()=>{
+  let sec=0,query="",openAll=false;
+  const list=h("div",{class:"list"}),chips=h("div",{class:"chips",role:"group","aria-label":"Välj avsnitt"});
+  const search=h("input",{type:"search","aria-label":"Sök begrepp",placeholder:"Sök begrepp…",oninput:e=>{query=e.target.value.toLowerCase();draw()}});
+  const toggle=h("button",{class:"chip","aria-pressed":"false",onclick:e=>{openAll=!openAll;e.target.setAttribute("aria-pressed",String(openAll));draw()}},"Visa alla förklaringar");
+  function draw(){
+    chips.replaceChildren(...[[0,"Alla"],...Object.entries(SECTIONS).map(([k,v])=>[+k,`${k}. ${v}`])].map(([k,v])=>h("button",{class:"chip","aria-pressed":String(sec===k),onclick:()=>{sec=k;draw()}},v)),toggle);
+    const ts=termsFor(sec).filter(t=>!query||(t.t+" "+t.d).toLowerCase().includes(query));
+    list.replaceChildren(...(ts.length?ts.map(t=>{
+      const d=h("details",{class:"t"},h("summary",{},h("span",{class:"dot"+(mastered(t.id)?" m":""),title:mastered(t.id)?"Bemästrat":"Inte bemästrat än"}),t.t,t.x?h("span",{class:"hint"}," (extra)"):null),h("div",{class:"d"},t.d));
+      d.open=openAll;return d;
+    }):[h("p",{},"Inga begrepp hittades.")]));
+  }
+  draw();
+  app.append(h("h2",{},"📖 Plugga begrepp"),h("p",{class:"sub"},"Tryck på ett begrepp för att se förklaringen. Tips: försök förklara det högt innan du öppnar! Grön prick = du kan det."),search,chips,list);
+};
+
+hud();
+go("home");
+</script>
+</body>
+</html>
