@@ -114,6 +114,12 @@ label.f{display:block;font-weight:700;margin:12px 0 4px}
 .slots{margin:6px 0;padding-left:30px}
 .slot{background:var(--ok-bg);border:2px solid var(--ok);color:#0d4a1f;border-radius:12px;padding:8px 12px;margin:6px 0;font-weight:600}
 .pool{display:grid;gap:10px}
+.transcript{display:grid;gap:8px;margin-top:14px}
+.pl{display:block;width:100%;text-align:left;border:2px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--card)}
+.pl b{display:block;font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.pl.host{background:var(--blue-l);margin-right:12%}
+.pl.exp{background:#fff8d6;margin-left:12%}
+.pl.now{border-color:var(--blue);box-shadow:0 0 0 3px rgba(58,63,181,.35)}
 </style>
 </head>
 <body>
@@ -233,6 +239,71 @@ const REASON=[
  {label:"Ditt svar",model:"Supernova. Efter en supernova kan det bli kvar ett svart hål.",points:["Supernova"]}]}
 ];
 
+const PODCAST=[
+{id:"p1",t:"Avsnitt 1: Solsystemet",min:"ca 3 min",lines:[
+["H","Hej och välkommen till Rymdpodden! Idag börjar vi nära hemma, i vårt eget solsystem. Med mig i studion har jag en rymdforskare. Hej!"],
+["F","Hej! Kul att vara här. Solsystemet är ett perfekt ställe att börja på."],
+["H","Vi börjar med det största: solen. Hur stor del av solsystemet är egentligen sol?"],
+["F","Nästan allt! Ungefär 99,8 procent av hela solsystemets massa finns i solen. Alla planeter, månar, asteroider och kometer tillsammans är bara en liten, liten rest."],
+["H","Och planeterna då? Det finns åtta stycken, eller hur?"],
+["F","Ja, åtta planeter, och de delas in i två grupper. Närmast solen ligger stenplaneterna: Merkurius, Venus, Jorden och Mars. De är små och har en fast yta av sten och metall. Längre ut ligger jätteplaneterna: Jupiter, Saturnus, Uranus och Neptunus."],
+["H","Vad är typiskt för jätteplaneterna?"],
+["F","De är gigantiska och består mest av gas, så de har ingen fast yta att stå på. De har också många månar och ringar. Jupiter är störst av dem alla. Den är mer än två gånger så tung som alla de andra planeterna tillsammans!"],
+["H","Wow! Nu har jag en gåta. Merkurius ligger närmast solen, men Venus är varmare. Hur kan det komma sig?"],
+["F","Bra fråga, och den brukar komma på prov! På Merkurius är det plus 430 grader på dagsidan, men minus 180 grader på nattsidan. Merkurius har nästan ingen atmosfär, så värmen försvinner ut i rymden när solen inte lyser."],
+["F","Venus däremot har en jättetjock atmosfär full av koldioxid. Den fångar värmen, precis som i ett växthus. Det kallas växthuseffekt. Därför är det cirka plus 460 grader på Venus hela tiden, både dag och natt."],
+["H","Så det är atmosfären som avgör, inte avståndet till solen."],
+["F","Precis så."],
+["H","Jag har också hört att Pluto inte är en planet längre. Vad hände?"],
+["F","År 2006 bestämde astronomerna nya regler. En vanlig planet måste inte bara kretsa runt solen och vara rund, den måste också ha rensat sin bana från andra objekt. Pluto är mindre än vår måne och delar sin bana med massor av andra kroppar. Därför kallas den en dvärgplanet."],
+["H","En sak till. Planeterna lyser ju på natthimlen. Lyser de själva?"],
+["F","Nej! Planeter lyser inte av sig själva. De reflekterar solens ljus, lite som en spegel. Det är stjärnor, som solen, som lyser själva."],
+["H","Och vad är skillnaden mellan en asteroid och en komet?"],
+["F","En asteroid är ett mindre objekt av sten och metall i bana runt solen. En komet är gjord av is och stoft. Kommer den nära solen smälter isen, och kometen får en lysande svans."],
+["H","Då sammanfattar vi!"],
+["F","Tre saker att komma ihåg. Ett: solen har cirka 99,8 procent av massan. Två: planeterna delas in i stenplaneter och jätteplaneter. Tre: planeter lyser inte själva, de reflekterar solljus."],
+["H","Tack! I nästa avsnitt åker vi tillbaka i tiden, ända till Big Bang."]
+]},
+{id:"p2",t:"Avsnitt 2: Big Bang",min:"ca 2,5 min",lines:[
+["H","Välkommen tillbaka till Rymdpodden! Nu ska vi till början på allt: Big Bang."],
+["F","Det hände för ungefär 13,8 miljarder år sedan. Då startade universum. The Big Bang var en enorm expansion, där allt började växa och spridas ut."],
+["H","Många tänker sig en stor explosion. Är det rätt?"],
+["F","Det är lättare att tänka sig att själva rymden sträcker ut sig, och att universum har expanderat ända sedan dess."],
+["H","Hur varmt var det i början?"],
+["F","Otroligt hett och tätt. Men eftersom universum expanderade blev det snabbt kallare. Det är en viktig sak att komma ihåg: när universum expanderar, sjunker temperaturen."],
+["H","Vad bildades först?"],
+["F","Under de allra första minuterna bildades de två lättaste grundämnena: väte och helium. Än idag utgör de ungefär 99 procent av den synliga materien i universum."],
+["H","Alltså fanns det varken syre eller järn från början?"],
+["F","Nej. Tyngre grundämnen som syre, kol och järn bildades senare, inne i stjärnor. Det tar vi i nästa avsnitt."],
+["H","Jag har hört att det finns ett eko från Big Bang. Stämmer det?"],
+["F","Ja! Efter ungefär 380 000 år hade universum svalnat så mycket att ljuset kunde färdas fritt. Det ljuset finns kvar än idag, som ett svagt eko som vi kan mäta överallt i rymden. Det kallas kosmisk bakgrundsstrålning, och den är ungefär 270 minusgrader."],
+["H","Hur gick det sedan?"],
+["F","Gravitationen drog ihop gasmoln, och de första stjärnorna bildades. Stjärnorna samlades i galaxer. En galax är en enorm samling stjärnor, gas och mörk materia som hålls ihop av gravitation. Vår galax heter Vintergatan och har hundratals miljarder stjärnor."],
+["H","Då sammanfattar vi!"],
+["F","Fyra saker att komma ihåg. Ett: Big Bang skedde för 13,8 miljarder år sedan. Två: väte och helium bildades först. Tre: ekot kallas kosmisk bakgrundsstrålning. Fyra: när universum expanderar, blir det kallare."],
+["H","Tack! Nästa gång handlar det om stjärnornas liv."]
+]},
+{id:"p3",t:"Avsnitt 3: Stjärnornas liv",min:"ca 3 min",lines:[
+["H","Hej igen! Idag handlar det om stjärnor: hur de föds, lever och dör."],
+["F","Allt börjar i en nebulosa. Det är ett stort moln av gas och stoft ute i rymden. Där föds stjärnor, och ibland dör de också där."],
+["H","Hur blir ett gasmoln till en stjärna?"],
+["F","Gravitationen drar ihop gas och stoft till klumpar. När klumpen blir tätare blir den också varmare, särskilt i mitten. När temperaturen blir tillräckligt hög, ungefär tio miljoner grader, startar kärnfusion."],
+["H","Vad är kärnfusion?"],
+["F","Väteatomer slås ihop till helium, och enorma mängder energi frigörs. Då börjar gasklotet lysa. En stjärna är alltså ett lysande gasklot som skapar egen energi genom kärnfusion. Så fungerar vår sol."],
+["H","Hur länge kan en stjärna lysa?"],
+["F","Så länge den har väte som bränsle. Vår sol är ungefär 4,6 miljarder år gammal, och den har bränsle i ytterligare ungefär fem miljarder år."],
+["H","Vad händer när bränslet tar slut?"],
+["F","Det beror på stjärnans storlek. En mindre eller medelstor stjärna, som solen, sväller upp och blir en röd jätte. Det är en uppsvälld och svalare stjärna. Sedan blåses de yttre lagren bort, och kvar blir den täta, heta kärnan. Den kallas vit dvärgstjärna och svalnar sakta."],
+["H","Och de riktigt stora stjärnorna?"],
+["F","En mycket massiv stjärna får ett våldsamt slut. Den exploderar i en supernova, en av de kraftigaste explosionerna som finns. Efter en supernova kan det bli kvar ett svart hål. Det är en plats med så stark gravitation att inte ens ljus slipper ut."],
+["H","Och vad händer med allt som sprids ut?"],
+["F","Det är det häftiga. Stjärnor bildar grundämnen som kol, syre och järn. När de dör sprids ämnena ut i rymden och blir en del av nya nebulosor, nya stjärnor, nya planeter, och till sist även människor. Vi är faktiskt gjorda av stjärnstoft."],
+["H","Då sammanfattar vi!"],
+["F","Tre saker att komma ihåg. Ett: en nebulosa dras ihop av gravitationen, och när kärnfusionen startar är en stjärna född. Två: en stjärna som solen blir en röd jätte och sedan en vit dvärg. Tre: en mycket massiv stjärna dör i en supernova, och kan lämna efter sig ett svart hål."],
+["H","Tack för att du lyssnade! Nu kan du provet. Lycka till!"]
+]}
+];
+
 const LEVELS=[[0,"Rymdkadett"],[100,"Astronaut"],[250,"Raketpilot"],[450,"Rymdkapten"],[700,"Stjärnforskare"],[1000,"Astronomimästare"]];
 const BADGES=[
 {id:"first",em:"🚀",n:"Uppskjutning",d:"Spela en omgång"},
@@ -242,6 +313,7 @@ const BADGES=[
 {id:"sorter",em:"🗂️",n:"Sorteringsmästare",d:"Sortera utan fel"},
 {id:"ordna",em:"🪐",n:"Planetordnaren",d:"Ordna en serie utan fel"},
 {id:"tank",em:"🔭",n:"Förklararen",d:"Klara alla ”Förklara”-frågor"},
+{id:"lyssna",em:"🎧",n:"Poddlyssnaren",d:"Lyssna klart på alla tre avsnitten"},
 {id:"lvl3",em:"👩‍🚀",n:"Raketpilot",d:"Nå nivå 3"},
 {id:"ready",em:"🏆",n:"Provklar",d:`Bemästra ${READY} begrepp`}
 ];
@@ -271,7 +343,7 @@ function wsample(items,k,wf){
   return out;
 }
 const KEY="rymdspelet-astronomi-v1";
-const S={xp:0,mastery:{},badges:[],done:{},sound:true};
+const S={xp:0,mastery:{},badges:[],done:{},heard:{},sound:true};
 try{Object.assign(S,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const mOf=id=>S.mastery[id]||{ok:0,bad:0};
@@ -377,6 +449,7 @@ const VIEWS={};
 VIEWS.home=()=>{
   const mc=masteredCount();
   const tiles=[
+    ["🎧","Rymdpodden","Lyssna på tre korta avsnitt som går igenom allt – bra som start eller till kvällen.","listen"],
     ["⚡","Quiz","10 snabba frågor. Fel svar kostar ett liv – du har tre.","quiz"],
     ["🃏","Memory","Para ihop begrepp och förklaring.","memory"],
     ["🗂️","Sortera","Stenplanet eller jätteplanet? Planet, asteroid eller komet? Tryck på rätt låda.","sort"],
@@ -395,7 +468,7 @@ VIEWS.home=()=>{
     })),
     h("h3",{style:"margin-top:26px"},"Brickor"),
     h("div",{class:"badges"},BADGES.map(b=>{const on=S.badges.includes(b.id);return h("div",{class:"badge"+(on?" on":"")},h("span",{class:"em","aria-hidden":"true"},b.em),h("b",{},b.n),h("div",{},on?"Upplåst!":b.d))})),
-    h("p",{style:"margin-top:24px"},h("button",{class:"btn ghost",onclick:()=>{if(confirm("Nollställa all framgång?")){Object.assign(S,{xp:0,mastery:{},badges:[],done:{}});save();hud();go("home")}}},"Nollställ framsteg"))
+    h("p",{style:"margin-top:24px"},h("button",{class:"btn ghost",onclick:()=>{if(confirm("Nollställa all framgång?")){Object.assign(S,{xp:0,mastery:{},badges:[],done:{},heard:{}});save();hud();go("home")}}},"Nollställ framsteg"))
   );
 };
 
@@ -554,6 +627,78 @@ function playSort(set){
   }
   show();
 }
+
+/* ============ LYSSNA ============ */
+const synth=window.speechSynthesis;
+const svVoices=()=>synth?synth.getVoices().filter(v=>/^sv/i.test(v.lang)):[];
+VIEWS.listen=()=>{
+  app.append(h("h2",{},"🎧 Rymdpodden"),
+    h("p",{class:"sub"},"Tre korta avsnitt som går igenom allt som kommer på provet. Perfekt att lyssna på innan du sover eller på bussen. Du kan lyssna klart på alla tre för att få en bricka."),
+    h("div",{class:"grid menu"},PODCAST.map(ep=>h("button",{class:"tile",onclick:()=>go("episode",ep.id)},
+      h("span",{class:"em","aria-hidden":"true"},"🎙️"),
+      h("b",{},ep.t,S.heard[ep.id]?h("span",{class:"done-tag"}," ✓ lyssnat"):null),
+      h("span",{class:"d"},ep.min)))));
+};
+VIEWS.episode=id=>{
+  const ep=PODCAST.find(x=>x.id===id),n=PODCAST.indexOf(ep);
+  let idx=0,playing=false,run=0,rate=1;
+  const status=h("p",{class:"hint","aria-live":"polite"});
+  const playBtn=h("button",{class:"btn alt",onclick:()=>playing?pause():play()},"▶ Spela");
+  const restart=h("button",{class:"btn ghost",onclick:()=>{pause();idx=0;mark(-1);playBtn.textContent="▶ Spela"}},"⏮ Från början");
+  const speeds=[["Lugnt",.85],["Normalt",1],["Snabbt",1.2]];
+  const speedEls=h("div",{class:"chips",role:"group","aria-label":"Hastighet",style:"margin:8px 0"});
+  const drawSpeeds=()=>speedEls.replaceChildren(...speeds.map(([l,v])=>h("button",{class:"chip","aria-pressed":String(rate===v),onclick:()=>{rate=v;drawSpeeds()}},l)));
+  drawSpeeds();
+  const lineEls=ep.lines.map(([who,text],i)=>h("button",{class:"pl "+(who==="H"?"host":"exp"),onclick:()=>{idx=i;play()},"aria-label":`Spela härifrån: ${text}`},
+    h("b",{},who==="H"?"Programledare":"Forskare"),h("span",{},text)));
+  const transcript=h("div",{class:"transcript"},lineEls);
+  const textToggle=h("button",{class:"chip","aria-pressed":"true",onclick:e=>{const on=e.target.getAttribute("aria-pressed")!=="true";e.target.setAttribute("aria-pressed",String(on));transcript.hidden=!on}},"Visa text");
+  const next=h("div",{style:"margin-top:14px"});
+  function mark(i){
+    lineEls.forEach((el,k)=>el.classList.toggle("now",k===i));
+    if(i>=0&&!transcript.hidden)lineEls[i].scrollIntoView({block:"center",behavior:reduce?"auto":"smooth"});
+  }
+  function check(){
+    if(!synth||!("SpeechSynthesisUtterance" in window)){status.textContent="Den här webbläsaren kan inte läsa upp text. Läs texten nedan istället.";playBtn.disabled=true;return false}
+    if(!svVoices().length){status.textContent="Hittar ingen svensk röst på den här enheten. Läs texten nedan istället (tips: i Safari på iPad kan du lägga till en svensk röst under Inställningar → Hjälpmedel → Uppläst innehåll → Röster).";playBtn.disabled=true;return false}
+    playBtn.disabled=false;status.textContent="Hör du inget? Kolla att volymen är uppe och att enheten inte är på ljudlöst.";return true;
+  }
+  if(synth)synth.onvoiceschanged=check;
+  check();
+  function speak(){
+    if(!playing)return;
+    if(idx>=ep.lines.length)return finish();
+    mark(idx);
+    const my=++run,[who,text]=ep.lines[idx],vs=svVoices();
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="sv-SE";u.voice=(who==="H"?vs[0]:(vs[1]||vs[0]))||null;
+    u.pitch=who==="H"?1.1:.85;u.rate=rate;
+    u.onend=()=>{if(my===run&&playing){idx++;speak()}};
+    u.onerror=e=>{if(my===run&&playing&&e.error!=="canceled"&&e.error!=="interrupted"){idx++;speak()}};
+    synth.speak(u);
+  }
+  function play(){
+    if(!check())return;
+    if(idx>=ep.lines.length)idx=0;
+    playing=true;run++;if(synth.speaking||synth.pending)synth.cancel();
+    playBtn.textContent="⏸ Pausa";speak();
+  }
+  function pause(){
+    playing=false;run++;if(synth)synth.cancel();
+    playBtn.textContent="▶ Fortsätt";
+  }
+  function finish(){
+    playing=false;idx=0;mark(-1);playBtn.textContent="▶ Lyssna igen";
+    const first=!S.heard[ep.id];S.heard[ep.id]=true;save();played();
+    if(first){addXp(15);toast("🎧 Avsnittet klart! +15 XP");sfx.win()}
+    if(PODCAST.every(x=>S.heard[x.id]))unlock("lyssna");
+    next.replaceChildren(PODCAST[n+1]
+      ?h("button",{class:"btn",onclick:()=>go("episode",PODCAST[n+1].id)},"Nästa avsnitt ▶")
+      :h("button",{class:"btn",onclick:()=>go("quiz")},"Testa dig själv i quizet ▶"));
+  }
+  cleanup=()=>{playing=false;run++;if(synth){synth.cancel();synth.onvoiceschanged=null}};
+  app.append(h("h2",{},"🎙️ "+ep.t),h("div",{class:"card"},h("div",{class:"row"},playBtn,restart,textToggle),speedEls,status),next,transcript);
+};
 
 /* ============ ORDNA ============ */
 VIEWS.order=()=>{
